@@ -4,7 +4,7 @@ VERSION_FILE := internal/version/version.go
 
 .PHONY: build
 build:
-	go build -o dg ./cmd/dg
+	go build -o build/dg ./cmd/dg
 
 .PHONY: test
 test:
