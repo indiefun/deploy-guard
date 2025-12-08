@@ -41,3 +41,20 @@ bump-major:
 	IFS=. read -r major minor patch <<< $${v#v}; \
 	new=v$$((major+1)).0.0; \
 	$(MAKE) release VERSION=$$new
+
+.PHONY: install
+install: build
+	@dst=/usr/local/bin/dg; \
+	echo "Installing to $$dst"; \
+	sudo install -m 0755 build/dg $$dst; \
+	command -v dg >/dev/null && echo "dg installed: $$(command -v dg)" || echo "dg installed to $$dst"
+
+.PHONY: uninstall
+uninstall:
+	@dst=/usr/local/bin/dg; \
+	if [ -f "$$dst" ]; then \
+	  echo "Removing $$dst"; \
+	  sudo rm -f "$$dst"; \
+	else \
+	  echo "$$dst not found"; \
+	fi
