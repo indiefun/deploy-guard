@@ -1,0 +1,51 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Build tarballs
+        run: |
+          set -e
+          mkdir -p dist
+          BIN=dg
+          go mod tidy
+          for GOOS in linux; do
+            for GOARCH in amd64 arm64; do
+              echo "Building for $GOOS/$GOARCH"
+              CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -o build/${BIN} ./cmd/dg
+              NAME=${BIN}_${{ github.ref_name }}_${GOOS}_${GOARCH}
+              tar -C build -czf dist/${NAME}.tar.gz ${BIN}
+              rm -f build/${BIN}
+            done
+          done
+
+      - name: Create release via changelogithub
+        run: npx changelogithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
