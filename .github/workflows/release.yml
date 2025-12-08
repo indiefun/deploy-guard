@@ -17,7 +17,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: lts/*
+
+      - name: Create release via changelogithub
+        run: npx changelogithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -39,11 +44,6 @@ jobs:
               rm -f build/${BIN}
             done
           done
-
-      - name: Create release via changelogithub
-        run: npx changelogithub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v1
