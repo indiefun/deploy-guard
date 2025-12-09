@@ -38,7 +38,7 @@ func Install(cfgAbs string) error {
 	// build rule
 	rl := ruleLine(pathToDG, abs, expr)
 	// read existing crontab
-	currentOut, _ := exec.Command("bash", "-lc", "crontab -l || true").CombinedOutput()
+	currentOut, _ := exec.Command("bash", "-lc", "crontab -l").Output()
 	lines := strings.Split(string(currentOut), "\n")
 	var out []string
 	for _, l := range lines {
@@ -66,7 +66,7 @@ func Uninstall(cfgAbs string) error {
 	if err != nil {
 		return err
 	}
-	currentOut, _ := exec.Command("bash", "-lc", "crontab -l || true").CombinedOutput()
+	currentOut, _ := exec.Command("bash", "-lc", "crontab -l").Output()
 	lines := strings.Split(string(currentOut), "\n")
 	var out []string
 	for _, l := range lines {
