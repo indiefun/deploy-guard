@@ -1,5 +1,7 @@
 # dg — Deployment Guard (Go)
 
+[中文](README-CN.md)
+
 A simple, pragmatic deployment guard written in Go. It detects updates (Docker image digests) and runs your scripts via cron, with daily logs and safe pid-based concurrency.
 
 ## Features
