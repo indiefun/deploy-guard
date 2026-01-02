@@ -11,7 +11,7 @@ A simple, pragmatic deployment guard written in Go. It detects updates (Docker i
 - Safe concurrency via pid semantics in `.dg/state.yml` (pid=0 idle; pid>0 and process exists → running).
 - Cron integration: install/uninstall rules strictly filtered by `-config <abs path>`.
 - Clear CLI: `run`, `install`, `uninstall`, `help`, `version`.
-- Planned: Git branches head changes, new tags detection.
+- Git monitoring: detects branch head changes and new tags.
 
 ## Quick Start
 ```bash
@@ -48,8 +48,11 @@ watchs:
       - postgres:17
       - redis:8
   git:
-    branches: [main, dev]  # planned
-    tags: true             # planned
+    remote: origin         # optional, default: origin
+    branches: [main, dev]  # optional
+    tags: true             # optional, check for new tags
+    username: myuser       # optional, for HTTPS only
+    password: mypass       # optional, for HTTPS only
 scripts:
   - /absolute/path/script1.sh
   - ./relative/to/config.yml/dir/script2.sh
@@ -62,6 +65,8 @@ logs:
   - Logs: `<config-dir>/logs/YYYY-MM-DD.log`
   - State: `<config-dir>/state.yml`
 - Cron expression must be 5 fields (minute hour day month weekday). If you need seconds, use an external scheduler.
+- `scripts` list must not be empty.
+- At least one watch (`docker` or `git`) must be enabled.
 
 ## Run Behavior
 - If `<config-dir>/state.yml` has `pid>0` and the process exists, the current run is skipped.
@@ -99,6 +104,7 @@ make bump-major              # vX.Y.Z → v(X+1).0.0
 ## Security Notes
 - No secrets are logged.
 - Registry auth uses Docker keychain (`~/.docker/config.json`) via `go-containerregistry` default keychain.
+- Git HTTPS credentials in config are used only in memory, but the constructed URL might be briefly visible in process list (`ps`). Use SSH or system credentials helper if this is a concern.
 
 ## Dependencies
 - `gopkg.in/yaml.v3` — YAML parsing.
@@ -106,8 +112,6 @@ make bump-major              # vX.Y.Z → v(X+1).0.0
 - System Docker CLI — local image inspect via `docker image inspect`.
 
 ## Roadmap
-- Git branches head change detection.
-- Git tags new detection.
 - Optional checksums and signed release artifacts.
 
 ## License

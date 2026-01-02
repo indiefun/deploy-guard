@@ -11,7 +11,7 @@
 - 通过 `.dg/state.yml` 中的 pid 语义实现安全并发（pid=0 表示空闲；pid>0 且进程存在 → 表示运行中）。
 - Cron 集成：严格通过 `-config <绝对路径>` 过滤安装/卸载规则。
 - 清晰的 CLI：`run`（运行）, `install`（安装）, `uninstall`（卸载）, `help`（帮助）, `version`（版本）。
-- 计划中：Git 分支 head 变更检测，新标签检测。
+- Git 监控：检测分支 head 变更及新标签。
 
 ## 快速开始
 ```bash
@@ -48,8 +48,11 @@ watchs:
       - postgres:17
       - redis:8
   git:
-    branches: [main, dev]  # 计划中
-    tags: true             # 计划中
+    remote: origin         # 可选，默认：origin
+    branches: [main, dev]  # 可选
+    tags: true             # 可选，检测新标签
+    username: myuser       # 可选，仅 HTTPS 需要
+    password: mypass       # 可选，仅 HTTPS 需要
 scripts:
   - /absolute/path/script1.sh
   - ./relative/to/config.yml/dir/script2.sh
@@ -62,6 +65,8 @@ logs:
   - 日志：`<config-dir>/logs/YYYY-MM-DD.log`
   - 状态：`<config-dir>/state.yml`
 - Cron 表达式必须包含 5 个字段（分 时 日 月 周）。如果需要秒级精度，请使用外部调度器。
+- `scripts` 列表不能为空。
+- 必须至少启用一项监控（`docker` 或 `git`）。
 
 ## 运行行为
 - 如果 `<config-dir>/state.yml` 中 `pid>0` 且对应进程存在，则跳过当前运行。
@@ -99,6 +104,7 @@ make bump-major              # vX.Y.Z → v(X+1).0.0
 ## 安全说明
 - 不会记录任何机密信息 (Secrets)。
 - 仓库认证通过 `go-containerregistry` 默认密钥环使用 Docker 密钥环（`~/.docker/config.json`）。
+- 配置中的 Git HTTPS 凭据仅在内存中使用，但构造的 URL 可能会在进程列表 (`ps`) 中短暂可见。如有顾虑，请使用 SSH 或系统凭据助手。
 
 ## 依赖项
 - `gopkg.in/yaml.v3` — YAML 解析。
@@ -106,8 +112,6 @@ make bump-major              # vX.Y.Z → v(X+1).0.0
 - 系统 Docker CLI — 通过 `docker image inspect` 检查本地镜像。
 
 ## 路线图 (Roadmap)
-- Git 分支 head 变更检测。
-- Git 标签新增检测。
 - 可选的校验和及签名发布产物。
 
 ## 许可证
