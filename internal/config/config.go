@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -37,6 +38,15 @@ func Load(cfgAbs string) (*Config, string, error) {
 	if err := yaml.Unmarshal(b, &c); err != nil {
 		return nil, "", err
 	}
+	if c.Cron == "" {
+		return nil, "", errors.New("cron is required")
+	}
+	if len(strings.Fields(c.Cron)) != 5 {
+		return nil, "", errors.New("cron expression must have exactly 5 fields")
+	}
+	if len(c.Scripts) == 0 {
+		return nil, "", errors.New("scripts are required")
+	}
 	root := filepath.Dir(cfgAbs)
 	if c.Logs.RetainDays <= 0 {
 		c.Logs.RetainDays = 7
@@ -47,7 +57,7 @@ func Load(cfgAbs string) (*Config, string, error) {
 		}
 	}
 	if len(c.Watchs.Docker.Images) == 0 && !c.Watchs.Git.Tags && len(c.Watchs.Git.Branches) == 0 {
-		return nil, "", errors.New("no watchs configured")
+		return nil, "", errors.New("at least one watch must be configured: docker.images, git.branches, or git.tags")
 	}
 	return &c, root, nil
 }
