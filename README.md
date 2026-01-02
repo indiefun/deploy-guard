@@ -13,6 +13,16 @@ A simple, pragmatic deployment guard written in Go. It detects updates (Docker i
 - Clear CLI: `run`, `install`, `uninstall`, `help`, `version`.
 - Git monitoring: detects branch head changes and new tags.
 
+## Installation
+
+**Linux**
+
+You can easily install or update to the latest version of `dg` using the one-click installation script. This will download the binary and install it to `/usr/local/bin`.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/indiefun/deploy-guard/main/install.sh | bash
+```
+
 ## Quick Start
 ```bash
 # Build

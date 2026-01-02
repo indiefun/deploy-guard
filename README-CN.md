@@ -13,6 +13,16 @@
 - 清晰的 CLI：`run`（运行）, `install`（安装）, `uninstall`（卸载）, `help`（帮助）, `version`（版本）。
 - Git 监控：检测分支 head 变更及新标签。
 
+## 安装
+
+**Linux**
+
+你可以使用一键安装脚本轻松安装或更新 `dg` 到最新版本。该脚本会自动检测系统架构，下载并安装到 `/usr/local/bin` 目录。
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/indiefun/deploy-guard/main/install.sh | bash
+```
+
 ## 快速开始
 ```bash
 # 构建
